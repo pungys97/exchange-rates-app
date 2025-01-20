@@ -7,8 +7,8 @@ export interface ExchangeRate {
 }
 
 export const fetchExchangeRates = async (): Promise<ExchangeRate[]> => {
-  const corsProxy = import.meta.env.VITE_CORS_PROXY || 'http://localhost:3000/'
-  const targetUrl = import.meta.env.VITE_CNB_API_URL || 'https://www.cnb.cz/en/financial-markets/foreign-exchange-market/central-bank-exchange-rate-fixing/central-bank-exchange-rate-fixing/daily.txt';
+  const corsProxy = import.meta.env.VITE_CORS_PROXY
+  const targetUrl = 'https://www.cnb.cz/en/financial-markets/foreign-exchange-market/central-bank-exchange-rate-fixing/central-bank-exchange-rate-fixing/daily.txt';
   
   const response = await fetch(corsProxy + targetUrl);
   if (!response.ok) {
