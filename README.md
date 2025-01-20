@@ -59,6 +59,8 @@ bun run build
 - Vite
 - Vitest + Testing Library
 
+This project was bootstrapped with `npm create vite@latest . -- --template react-ts`
+
 ## API Documentation
 
 The application uses the Czech National Bank's exchange rate API:
