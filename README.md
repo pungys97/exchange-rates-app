@@ -10,45 +10,6 @@ A React application that fetches and displays current exchange rates from the Cz
 - Built with React, TypeScript, and Styled Components
 - Includes automated tests
 
-## Prerequisites
-
-- [Bun](https://bun.sh/) package manager
-
-## Getting Started
-
-1. Clone the repository:
-```bash
-git clone <your-repo-url>
-cd <repo-name>
-```
-
-2. Install dependencies:
-```bash
-bun install
-```
-
-3. Start the development server:
-```bash
-bun run dev
-```
-
-4. Open [http://localhost:5173](http://localhost:5173) to view the app in your browser.
-
-## Running Tests
-
-To run the tests:
-
-```bash
-bun test
-```
-
-## Building for Production
-
-To create a production build:
-
-```bash
-bun run build
-```
 
 ## Technologies Used
 
