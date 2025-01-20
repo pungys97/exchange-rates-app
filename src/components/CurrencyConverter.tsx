@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import styled from 'styled-components'
 import { useQuery } from '@tanstack/react-query'
 import { fetchExchangeRates } from '../services/exchangeRates'
@@ -106,36 +106,6 @@ const Select = styled.select`
   }
 `
 
-const Button = styled.button`
-  padding: 0.75rem 1.5rem;
-  background-color: #4dabf7;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  font-size: 1rem;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: #339af0;
-  }
-
-  &:active {
-    background-color: #228be6;
-    border: none;
-  }
-
-  &:focus {
-    outline: none;
-  }
-
-  &:disabled {
-    background-color: #adb5bd;
-    cursor: not-allowed;
-  }
-`
-
 const Result = styled.div`
   font-size: 1.5rem;
   font-weight: bold;
@@ -151,39 +121,24 @@ const Result = styled.div`
 export function CurrencyConverter() {
   const [amount, setAmount] = useState('')
   const [selectedCurrency, setSelectedCurrency] = useState('')
-  const [convertedAmount, setConvertedAmount] = useState<number | null>(null)
   
   const { data: rates, isLoading, error } = useQuery({
     queryKey: ['exchangeRates'],
     queryFn: fetchExchangeRates,
   })
   
+  const convertedAmount = useMemo(() => {
+    if (!selectedCurrency || amount === '' || !rates) return null
+    
+    const rate = rates.find(r => r.code === selectedCurrency)
+    if (!rate) return null
+
+    return (Number(amount) / rate.rate) * rate.amount
+  }, [amount, selectedCurrency, rates])
+
   if (isLoading) return <div>Loading...</div>
   if (error) return <div>Error loading exchange rates</div>
   if (!rates) return null
-
-  const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAmount(e.target.value)
-    setConvertedAmount(null)
-  }
-
-  const handleCurrencyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedCurrency(e.target.value)
-    setConvertedAmount(null)
-  }
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!selectedCurrency || amount === '') return
-
-    const rate = rates.find(r => r.code === selectedCurrency)
-    if (!rate) return
-
-    const convertedAmount = (Number(amount) / rate.rate) * rate.amount
-    setConvertedAmount(convertedAmount)
-  }
-
-  const isFormValid = amount !== '' && selectedCurrency !== ''
 
   const formatAmountAsCurrency = (amount: number, currency: string) => {
     return new Intl.NumberFormat('en-US', { style: 'currency', currency }).format(amount)
@@ -193,17 +148,17 @@ export function CurrencyConverter() {
     <Container>
       <Title>Czech National Bank Exchange Rates</Title>
       
-      <Form onSubmit={handleSubmit}>
+      <Form onSubmit={(e) => e.preventDefault()}>
         <Input
           type="number"
           value={amount}
-          onChange={handleAmountChange}
+          onChange={(e) => setAmount(e.target.value)}
           placeholder="Amount in CZK"
           aria-label="Amount in CZK"
         />
         <Select
           value={selectedCurrency}
-          onChange={handleCurrencyChange}
+          onChange={(e) => setSelectedCurrency(e.target.value)}
           aria-label="Select currency"
         >
           <option value="">Select currency</option>
@@ -213,14 +168,11 @@ export function CurrencyConverter() {
             </option>
           ))}
         </Select>
-        <Button type="submit" disabled={!isFormValid}>
-          Convert
-        </Button>
       </Form>
 
       {convertedAmount !== null && selectedCurrency && (
         <Result>
-            {formatAmountAsCurrency(Number(amount), 'CZK')} = {formatAmountAsCurrency(convertedAmount, selectedCurrency)}
+          {formatAmountAsCurrency(Number(amount), 'CZK')} = {formatAmountAsCurrency(convertedAmount, selectedCurrency)}
         </Result>
       )}
 
